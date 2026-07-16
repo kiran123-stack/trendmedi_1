@@ -1,3 +1,8 @@
+// ============================================================
+// TRENDMEDI — PREMIUM B2B MEDICAL PLATFORM
+// Complete JavaScript — Search, Modal, Animations
+// ============================================================
+
 // ---------- Preloader (guaranteed to dismiss) ----------
 (function(){
   var pre = document.getElementById('preloader');
@@ -30,6 +35,7 @@
   if(isTouch) return;
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
+  if(!cursor || !ring) return;
   let mx=0,my=0,rx=0,ry=0;
   window.addEventListener('mousemove',e=>{
     mx=e.clientX;my=e.clientY;
@@ -107,162 +113,16 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   });
 });
 
-/* ═══════════════════════════════════════════════════════════
-   CINEMATIC ENGINE — everything below is generated in code.
-   No video files, no libraries. Pure canvas + rAF.
-   ═══════════════════════════════════════════════════════════ */
-
+// ---------- Reduced Motion Detection ----------
 var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ── 1. AURORA CANVAS ───────────────────────────────────────
-   Layered metaballs drifting on sine paths, drawn with radial
-   gradients + 'lighter' blending. Reads like a slow liquid
-   gradient video, but it's ~40 lines of math.                */
-(function(){
-  var cv = document.getElementById('auroraCanvas');
-  if(!cv || REDUCED) return;
-  var ctx = cv.getContext('2d');
-  var w, h, dpr, t = 0, running = true;
 
-  var blobs = [
-    {r:.42, hue:'26,143,90',  ax:.22, ay:.14, sx:.00021, sy:.00017, ox:.30, oy:.35, a:.30},
-    {r:.36, hue:'10,37,64',   ax:.26, ay:.18, sx:.00016, sy:.00024, ox:.68, oy:.30, a:.22},
-    {r:.30, hue:'77,214,147', ax:.30, ay:.20, sx:.00028, sy:.00013, ox:.50, oy:.62, a:.20},
-    {r:.34, hue:'26,143,90',  ax:.18, ay:.24, sx:.00012, sy:.00029, ox:.85, oy:.70, a:.16}
-  ];
-
-  function resize(){
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = cv.clientWidth; h = cv.clientHeight;
-    cv.width = w * dpr; cv.height = h * dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  function draw(){
-    if(!running) return;
-    ctx.clearRect(0,0,w,h);
-    ctx.globalCompositeOperation = 'lighter';
-    var base = Math.min(w,h);
-
-    for(var i=0;i<blobs.length;i++){
-      var b = blobs[i];
-      // Each blob rides two out-of-phase sine waves → organic, never-repeating drift
-      var x = (b.ox + Math.sin(t*b.sx + i*1.7) * b.ax) * w;
-      var y = (b.oy + Math.cos(t*b.sy + i*2.3) * b.ay) * h;
-      var r = base * b.r * (1 + Math.sin(t*0.00019 + i)*0.10); // breathing radius
-
-      var g = ctx.createRadialGradient(x,y,0,x,y,r);
-      g.addColorStop(0,   'rgba('+b.hue+','+b.a+')');
-      g.addColorStop(0.45,'rgba('+b.hue+','+(b.a*0.35)+')');
-      g.addColorStop(1,   'rgba('+b.hue+',0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    t += 16;
-    requestAnimationFrame(draw);
-  }
-
-  resize();
-  window.addEventListener('resize', resize);
-  // Pause when hero scrolls away — saves battery
-  new IntersectionObserver(function(e){
-    running = e[0].isIntersecting;
-    if(running) draw();
-  },{threshold:0}).observe(cv.parentElement);
-  draw();
-})();
-
-
-/* ── 2. ECG HEARTBEAT LINE ──────────────────────────────────
-   A real PQRST waveform, scrolling right-to-left with a glowing
-   scan head and a fading trail. Fully procedural.            */
-(function(){
-  var cv = document.getElementById('ecgCanvas');
-  if(!cv) return;
-  var ctx = cv.getContext('2d');
-  var w,h,dpr,x=0,running=true;
-
-  function resize(){
-    dpr = Math.min(window.devicePixelRatio||1,2);
-    w = cv.clientWidth; h = cv.clientHeight;
-    cv.width = w*dpr; cv.height = h*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.fillStyle = '#0a2540'; ctx.fillRect(0,0,w,h);
-  }
-
-  // PQRST morphology as a function of phase (0..1)
-  function ecg(p){
-    var y = 0;
-    y += 0.06 * Math.exp(-Math.pow((p-0.16)/0.022,2));  // P wave
-    y -= 0.09 * Math.exp(-Math.pow((p-0.29)/0.008,2));  // Q dip
-    y += 1.00 * Math.exp(-Math.pow((p-0.32)/0.010,2));  // R spike
-    y -= 0.26 * Math.exp(-Math.pow((p-0.36)/0.013,2));  // S dip
-    y += 0.20 * Math.exp(-Math.pow((p-0.55)/0.045,2));  // T wave
-    return y;
-  }
-
-  var PERIOD = 260;   // px per full heartbeat
-  var SPEED  = 2.4;   // px per frame
-
-  function draw(){
-    if(!running) return;
-    if(REDUCED){ return; }
-
-    // Trail fade: paint translucent navy over the whole band each frame
-    ctx.fillStyle = 'rgba(10,37,64,0.055)';
-    ctx.fillRect(0,0,w,h);
-
-    var mid = h*0.55, amp = h*0.30;
-
-    ctx.beginPath();
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.strokeStyle = '#4dd693';
-    ctx.shadowColor = 'rgba(77,214,147,0.9)';
-    ctx.shadowBlur = 12;
-
-    for(var i=0;i<=SPEED;i++){
-      var px = x + i;
-      var py = mid - ecg(((px % PERIOD) / PERIOD)) * amp;
-      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Glowing scan head
-    var hx = x + SPEED;
-    var hy = mid - ecg(((hx % PERIOD)/PERIOD)) * amp;
-    var g = ctx.createRadialGradient(hx,hy,0,hx,hy,9);
-    g.addColorStop(0,'rgba(255,255,255,0.95)');
-    g.addColorStop(0.4,'rgba(77,214,147,0.7)');
-    g.addColorStop(1,'rgba(77,214,147,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(hx,hy,9,0,Math.PI*2); ctx.fill();
-
-    x += SPEED;
-    if(x > w){ x = 0; ctx.fillStyle='#0a2540'; ctx.fillRect(0,0,w,h); }
-
-    requestAnimationFrame(draw);
-  }
-
-  resize();
-  window.addEventListener('resize', function(){ resize(); x = 0; });
-  new IntersectionObserver(function(e){
-    running = e[0].isIntersecting;
-    if(running) draw();
-  },{threshold:0}).observe(cv);
-  draw();
-})();
-
-
-/* ── 3. SPLIT-TEXT CHAR REVEAL ──────────────────────────────
-   Wraps every character in a span, then staggers them up from
-   behind a mask. The signature Cuberto headline entrance.    */
+// ══════════════════════════════════════════════════════════════
+// SPLIT-TEXT CHAR REVEAL (Cuberto-style stagger)
+// ══════════════════════════════════════════════════════════════
 (function(){
   document.querySelectorAll('[data-split]').forEach(function(el){
     var html = el.innerHTML;
-    // Preserve <em> tags by splitting on them
     var out = html.replace(/([^<>]+)(?=<|$)/g, function(txt){
       if(!txt.trim()) return txt;
       return txt.split(/(\s+)/).map(function(word){
@@ -275,7 +135,6 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     });
     el.innerHTML = out;
 
-    // Stagger each char
     var chars = el.querySelectorAll('.char');
     chars.forEach(function(c,i){
       c.style.transitionDelay = (i * 0.018 + 0.25) + 's';
@@ -286,7 +145,9 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 4. SCROLL PROGRESS BAR ─────────────────────────────────*/
+// ══════════════════════════════════════════════════════════════
+// SCROLL PROGRESS BAR
+// ══════════════════════════════════════════════════════════════
 (function(){
   var bar = document.getElementById('progressBar');
   if(!bar) return;
@@ -300,7 +161,9 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 5. PARALLAX (scroll-scrubbed depth) ────────────────────*/
+// ══════════════════════════════════════════════════════════════
+// PARALLAX (scroll-scrubbed depth)
+// ══════════════════════════════════════════════════════════════
 (function(){
   var els = document.querySelectorAll('[data-parallax]');
   if(!els.length || REDUCED) return;
@@ -313,7 +176,7 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var speed = parseFloat(el.dataset.parallax) || 0.1;
       var offset = (r.top + r.height/2 - vh/2) * -speed;
       var img = el.querySelector('img');
-      if(img) img.style.transform = 'translate3d(0,'+offset.toFixed(2)+'px,0) scale(1.12)';
+      if(img) img.style.transform = 'translate3d(0,'+offset.toFixed(2)+'px,0) scale(1.08)';
     });
     ticking = false;
   }
@@ -324,24 +187,9 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 6. CLIP-PATH CURTAIN REVEALS ───────────────────────────*/
-(function(){
-  var els = document.querySelectorAll('.clip-reveal');
-  if(!els.length) return;
-  if(!('IntersectionObserver' in window)){
-    els.forEach(function(e){ e.classList.add('in'); }); return;
-  }
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-    });
-  },{threshold:.15});
-  els.forEach(function(e){ io.observe(e); });
-})();
-
-
-/* ── 7. ANIMATED COUNT-UP ───────────────────────────────────
-   Eased number roll, fires once when scrolled into view.     */
+// ══════════════════════════════════════════════════════════════
+// ANIMATED COUNT-UP (fires once when scrolled into view)
+// ══════════════════════════════════════════════════════════════
 (function(){
   var counters = document.querySelectorAll('.count');
   if(!counters.length) return;
@@ -371,19 +219,19 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 8. 3D TILT ON PRODUCT CARDS ────────────────────────────
-   Cursor position maps to rotateX/rotateY. Card lifts toward
-   the pointer — expensive-feeling, costs nothing.            */
+// ══════════════════════════════════════════════════════════════
+// SUBTLE 3D TILT ON CARDS (hover interaction)
+// ══════════════════════════════════════════════════════════════
 (function(){
   if(matchMedia('(hover:none)').matches || REDUCED) return;
   document.querySelectorAll('.product-card, .quality-card, .test-card').forEach(function(card){
-    var MAX = 6; // degrees
+    var MAX = 4; // degrees (subtle)
     card.addEventListener('mousemove', function(e){
       var r = card.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width  - 0.5;
       var py = (e.clientY - r.top)  / r.height - 0.5;
       card.style.transform =
-        'perspective(1200px) rotateY('+(px*MAX)+'deg) rotateX('+(-py*MAX)+'deg) translateY(-6px) scale(1.012)';
+        'perspective(1200px) rotateY('+(px*MAX)+'deg) rotateX('+(-py*MAX)+'deg) translateY(-4px) scale(1.008)';
     });
     card.addEventListener('mouseleave', function(){
       card.style.transform = '';
@@ -392,7 +240,9 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 9. CLICK RIPPLE BURST ──────────────────────────────────*/
+// ══════════════════════════════════════════════════════════════
+// CLICK RIPPLE BURST
+// ══════════════════════════════════════════════════════════════
 (function(){
   if(REDUCED) return;
   document.addEventListener('click', function(e){
@@ -406,60 +256,9 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 
-/* ── 10. TEXT SCRAMBLE ON NAV HOVER ─────────────────────────
-   Decodes letters like a terminal. Small touch, big polish.  
-(function(){
-  if(matchMedia('(hover:none)').matches || REDUCED) return;
-  var GLYPHS = '!<>-_\\/[]{}—=+*^?#';
-
-  function scramble(el){
-    var original = el.dataset.text || el.textContent;
-    el.dataset.text = original;
-    var frame = 0, queue = [];
-
-    for(var i=0;i<original.length;i++){
-      queue.push({
-        from: original[i],
-        to: original[i],
-        start: Math.floor(Math.random()*12),
-        end: Math.floor(Math.random()*12) + 12
-      });
-    }
-
-    function update(){
-      var output = '', done = 0;
-      for(var i=0;i<queue.length;i++){
-        var q = queue[i];
-        if(frame >= q.end){ done++; output += q.to; }
-        else if(frame >= q.start){
-          if(!q.ch || Math.random() < 0.28){
-            q.ch = GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
-          }
-          output += '<span style="opacity:.55">'+q.ch+'</span>';
-        } else { output += q.from; }
-      }
-      el.innerHTML = output;
-      if(done < queue.length){ frame++; requestAnimationFrame(update); }
-      else el.textContent = original;
-    }
-    update();
-  }
-
-  document.querySelectorAll('.nav-links a').forEach(function(a){
-    a.addEventListener('mouseenter', function(){ scramble(a); });
-  });
-})();*/
-
-
-/* ── 11. SEAMLESS MARQUEE (duplicate track) ─────────────────*/
-(function(){
-  var inner = document.querySelector('.hero-marquee-inner');
-  if(!inner || REDUCED) return;
-  inner.innerHTML = inner.innerHTML + inner.innerHTML; // 2 tracks → loop is seamless
-})();
-
-
-/* ── 12. HEADER HIDE-ON-SCROLL-DOWN ─────────────────────────*/
+// ══════════════════════════════════════════════════════════════
+// HEADER HIDE-ON-SCROLL-DOWN
+// ══════════════════════════════════════════════════════════════
 (function(){
   var nav = document.getElementById('nav');
   var last = 0;
@@ -472,18 +271,260 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   nav.style.transition = nav.style.transition + ', transform .45s cubic-bezier(.22,1,.36,1)';
 })();
 
- (function(){
-  const slides=document.querySelectorAll(".hero-slide");
 
-let current=0;
+// ══════════════════════════════════════════════════════════════
+// HERO SLIDE ROTATOR
+// ══════════════════════════════════════════════════════════════
+(function(){
+  const slides = document.querySelectorAll(".hero-slide");
+  if(!slides.length) return;
+  let current = 0;
+  setInterval(()=>{
+    slides[current].classList.remove("active");
+    current = (current + 1) % slides.length;
+    slides[current].classList.add("active");
+  }, 5000);
+})();
 
-setInterval(()=>{
 
-slides[current].classList.remove("active");
+// ══════════════════════════════════════════════════════════════
+// SEARCH FUNCTIONALITY
+// ══════════════════════════════════════════════════════════════
+(function(){
+  var searchInput = document.getElementById('searchInput');
+  var searchResults = document.getElementById('searchResults');
+  if(!searchInput || !searchResults) return;
 
-current=(current+1)%slides.length;
+  // Searchable product/category data
+  var catalog = [
+    {
+      category: 'Medical Apparel',
+      items: [
+        { name: 'Surgical Scrub Suits', desc: 'Cotton blend, V-neck, unisex', section: '#products' },
+        { name: 'Doctor Lab Coats', desc: 'Full-sleeve, fluid-resistant', section: '#products' },
+        { name: 'Patient Gowns', desc: 'Tie-back, soft cotton, washable', section: '#products' },
+        { name: 'Nursing Uniforms', desc: 'Color-coded, comfortable fit', section: '#products' },
+        { name: 'Surgical Caps & Masks', desc: 'Disposable & reusable options', section: '#products' }
+      ]
+    },
+    {
+      category: 'Hospital Furniture',
+      items: [
+        { name: 'Motorized Hospital Beds', desc: 'ICU and general ward', section: '#products' },
+        { name: 'Examination Couches', desc: 'Adjustable backrest, powder-coated', section: '#products' },
+        { name: 'Bedside Lockers', desc: 'SS top, powder-coated body', section: '#products' },
+        { name: 'Overbed Tables', desc: 'Height adjustable, tilting top', section: '#products' },
+        { name: 'Crash Carts', desc: 'Emergency trolley, multi-drawer', section: '#products' },
+        { name: 'IV Stands', desc: 'Stainless steel, 4-hook', section: '#products' }
+      ]
+    },
+    {
+      category: 'Hospital Linen',
+      items: [
+        { name: 'Ward Bedsheets', desc: 'Cotton, industrial-wash grade', section: '#products' },
+        { name: 'OT Drapes', desc: 'Sterile, disposable & reusable', section: '#products' },
+        { name: 'Blankets', desc: 'Hypoallergenic, warm weave', section: '#products' },
+        { name: 'Pillow Slips', desc: 'Soft cotton, standard sizing', section: '#products' }
+      ]
+    },
+    {
+      category: 'Surgical Dressings',
+      items: [
+        { name: 'Cotton Crepe Bandages', desc: 'Various widths, high elasticity', section: '#products' },
+        { name: 'Absorbent Gauze Swabs', desc: 'Sterile, multi-pack', section: '#products' },
+        { name: 'Orthopedic Cast Padding', desc: 'Soft, cushioning layer', section: '#products' },
+        { name: 'Zig-Zag Cotton', desc: 'Medical-grade absorbent cotton', section: '#products' },
+        { name: 'Surgical Cotton Rolls', desc: 'Bleached, high absorbency', section: '#products' }
+      ]
+    },
+    {
+      category: 'Healthcare Consumables',
+      items: [
+        { name: 'Disposable Gloves', desc: 'Nitrile & latex, powdered/unpowdered', section: '#products' },
+        { name: 'Face Masks', desc: '3-ply surgical, N95 available', section: '#products' },
+        { name: 'Syringes & Needles', desc: 'Single-use, sterile packed', section: '#products' },
+        { name: 'Examination Paper Rolls', desc: 'Couch cover rolls', section: '#products' }
+      ]
+    }
+  ];
 
-slides[current].classList.add("active");
+  // Flatten for easy searching
+  var allItems = [];
+  catalog.forEach(function(cat){
+    cat.items.forEach(function(item){
+      allItems.push({
+        name: item.name,
+        desc: item.desc,
+        category: cat.category,
+        section: item.section
+      });
+    });
+  });
 
-},5000);
- })();
+  function renderResults(query){
+    if(!query || query.length < 2){
+      searchResults.classList.remove('active');
+      return;
+    }
+
+    var q = query.toLowerCase();
+    var matches = allItems.filter(function(item){
+      return item.name.toLowerCase().includes(q) ||
+             item.desc.toLowerCase().includes(q) ||
+             item.category.toLowerCase().includes(q);
+    });
+
+    if(matches.length === 0){
+      searchResults.innerHTML = '<div class="search-no-results">No products found for "' + query + '"</div>';
+      searchResults.classList.add('active');
+      return;
+    }
+
+    var html = matches.slice(0, 8).map(function(item){
+      return '<div class="search-result-item" data-section="' + item.section + '">' +
+        '<div class="result-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M12 4l8 8-8 8"/></svg></div>' +
+        '<div class="result-text"><h4>' + item.name + '</h4><p>' + item.category + ' · ' + item.desc + '</p></div>' +
+      '</div>';
+    }).join('');
+
+    searchResults.innerHTML = html;
+    searchResults.classList.add('active');
+
+    // Click to navigate
+    searchResults.querySelectorAll('.search-result-item').forEach(function(el){
+      el.addEventListener('click', function(){
+        var section = el.dataset.section;
+        if(section){
+          document.querySelector(section).scrollIntoView({ behavior: 'smooth' });
+        }
+        searchResults.classList.remove('active');
+        searchInput.value = '';
+      });
+    });
+  }
+
+  searchInput.addEventListener('input', function(){
+    renderResults(this.value.trim());
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e){
+    if(!searchResults.contains(e.target) && e.target !== searchInput){
+      searchResults.classList.remove('active');
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') searchResults.classList.remove('active');
+  });
+})();
+
+
+// ══════════════════════════════════════════════════════════════
+// PRODUCT CATEGORY MODAL (SKU Viewer)
+// ══════════════════════════════════════════════════════════════
+(function(){
+  var modal = document.getElementById('productModal');
+  var modalTitle = document.getElementById('modalTitle');
+  var skuGrid = document.getElementById('skuGrid');
+  var closeBtn = document.getElementById('modalClose');
+  if(!modal || !modalTitle || !skuGrid || !closeBtn) return;
+
+  // SKU Data per category
+  var skuData = {
+    'medical-apparel': {
+      title: 'Medical Apparel — Product Range',
+      items: [
+        { name: 'V-Neck Scrub Suit', material: 'Cotton-polyester blend', sizes: 'XS – 3XL', badge: 'Best Seller' },
+        { name: 'Full-Sleeve Lab Coat', material: '100% Cotton, fluid-resistant', sizes: 'S – 2XL', badge: 'Premium' },
+        { name: 'Patient Gown (Tie-Back)', material: 'Soft cotton, reusable', sizes: 'Standard / XL', badge: '' },
+        { name: 'Nursing Uniform Set', material: 'Cotton blend, color-coded', sizes: 'S – 2XL', badge: '' },
+        { name: 'Surgical Cap', material: 'Disposable & reusable', sizes: 'Universal', badge: '' },
+        { name: 'Shoe Covers', material: 'Non-woven fabric', sizes: 'Universal', badge: '' }
+      ]
+    },
+    'hospital-furniture': {
+      title: 'Hospital Furniture — Product Range',
+      items: [
+        { name: 'ICU Motorized Bed (5-Function)', material: 'CRCA steel, ABS panels', sizes: '2100×900mm', badge: 'Best Seller' },
+        { name: 'Semi-Fowler Bed', material: 'Mild steel, powder-coated', sizes: '1980×900mm', badge: '' },
+        { name: 'Examination Couch', material: 'SS top, adjustable backrest', sizes: '1830×600mm', badge: '' },
+        { name: 'Bedside Locker', material: 'SS top, powder-coated body', sizes: '400×400×800mm', badge: '' },
+        { name: 'Overbed Table', material: 'Laminated top, height-adjustable', sizes: '900×400mm', badge: '' },
+        { name: 'Emergency Crash Cart', material: 'ABS drawers, SS frame', sizes: 'Standard', badge: 'Premium' }
+      ]
+    },
+    'hospital-linen': {
+      title: 'Hospital Linen — Product Range',
+      items: [
+        { name: 'Ward Bedsheet (White)', material: '100% Cotton, 300 TC', sizes: '150×225 cm', badge: 'Best Seller' },
+        { name: 'OT Drape (Reusable)', material: 'Cotton, autoclavable', sizes: '150×200 cm', badge: '' },
+        { name: 'OT Drape (Disposable)', material: 'Non-woven SMS', sizes: '150×200 cm', badge: '' },
+        { name: 'Hospital Blanket', material: 'Polyester fleece', sizes: '150×225 cm', badge: '' },
+        { name: 'Pillow Slip (Pair)', material: 'Cotton, 250 TC', sizes: 'Standard', badge: '' }
+      ]
+    },
+    'surgical-dressings': {
+      title: 'Surgical Dressings — Product Range',
+      items: [
+        { name: 'Cotton Crepe Bandage', material: 'High-elasticity cotton', sizes: '5cm / 10cm / 15cm × 4m', badge: '' },
+        { name: 'Absorbent Gauze Swabs', material: 'Sterile, 8-ply', sizes: '7.5×7.5 cm', badge: 'Best Seller' },
+        { name: 'Orthopedic Cast Padding', material: 'Soft polyester', sizes: '7.5cm / 10cm × 2.7m', badge: '' },
+        { name: 'Zig-Zag Cotton', material: 'Medical-grade absorbent', sizes: '100g / 250g / 500g', badge: '' },
+        { name: 'Surgical Cotton Roll', material: 'Bleached BP quality', sizes: '500g / 1kg', badge: '' }
+      ]
+    },
+    'healthcare-consumables': {
+      title: 'Healthcare Consumables — Product Range',
+      items: [
+        { name: 'Nitrile Examination Gloves', material: 'Powder-free nitrile', sizes: 'S / M / L / XL', badge: 'Best Seller' },
+        { name: '3-Ply Surgical Mask', material: 'Non-woven, BFE ≥95%', sizes: 'Universal', badge: '' },
+        { name: 'N95 Respirator Mask', material: 'Multi-layer filtration', sizes: 'Standard', badge: 'Premium' },
+        { name: 'Disposable Syringe (Luer Lock)', material: 'Medical-grade PP', sizes: '2ml / 5ml / 10ml', badge: '' },
+        { name: 'Examination Paper Roll', material: 'Perforated tissue', sizes: '50cm × 50m', badge: '' }
+      ]
+    }
+  };
+
+  // Open modal when clicking product cards
+  document.querySelectorAll('.product-card[data-category]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      e.preventDefault();
+      var category = card.dataset.category;
+      var data = skuData[category];
+      if(!data) return;
+
+      modalTitle.textContent = data.title;
+
+      var html = data.items.map(function(sku){
+        return '<div class="sku-card">' +
+          '<h4>' + sku.name + '</h4>' +
+          '<div class="sku-meta">' +
+            '<span><b>Material:</b> ' + sku.material + '</span>' +
+            '<span><b>Sizes:</b> ' + sku.sizes + '</span>' +
+          '</div>' +
+          (sku.badge ? '<span class="sku-badge">' + sku.badge + '</span>' : '') +
+        '</div>';
+      }).join('');
+
+      skuGrid.innerHTML = html;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  // Close modal
+  function closeModal(){
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e){
+    if(e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeModal();
+  });
+})();
