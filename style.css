@@ -1,4 +1,3 @@
-
 /* ============================================================
    TRENDMEDI — PREMIUM B2B MEDICAL PLATFORM
    Complete CSS Design System
@@ -158,7 +157,7 @@ section { position: relative; padding: var(--section-pad) }
 .nav-search:focus-within {
   border-color: var(--accent);
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+  box-shadow: 0 0 0 3px rgba(26,143,90, 0.1);
 }
 .nav-search svg { width: 16px; height: 16px; color: var(--ink-muted); flex-shrink: 0 }
 .nav-search input {
@@ -177,7 +176,7 @@ section { position: relative; padding: var(--section-pad) }
 }
 .nav-cta:hover {
   background: var(--accent);
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 4px 14px rgba(26,143,90, 0.3);
 }
 
 /* Search Results Dropdown */
@@ -260,7 +259,7 @@ section { position: relative; padding: var(--section-pad) }
 }
 .btn-primary:hover {
   background: var(--accent);
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 8px 24px rgba(26,143,90, 0.3);
   transform: translateY(-2px);
 }
 .btn-secondary {
@@ -327,8 +326,8 @@ section { position: relative; padding: var(--section-pad) }
   border-radius: 50%; animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(13,148,136,0.5) }
-  50% { box-shadow: 0 0 0 8px rgba(13,148,136,0) }
+  0%,100% { box-shadow: 0 0 0 0 rgba(26,143,90,0.5) }
+  50% { box-shadow: 0 0 0 8px rgba(26,143,90,0) }
 }
 .hero-badge-text { font-size: 13px; font-weight: 500; color: var(--primary) }
 .hero-badge-text b {
@@ -509,7 +508,7 @@ section { position: relative; padding: var(--section-pad) }
 .quality::before {
   content: ""; position: absolute; top: -200px; right: -200px;
   width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(2,132,199,0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(26,143,90,0.12), transparent 70%);
   pointer-events: none;
 }
 .quality .section-head h2 { color: #fff }
@@ -530,12 +529,12 @@ section { position: relative; padding: var(--section-pad) }
 }
 .quality-card:hover {
   background: rgba(255,255,255,0.06);
-  border-color: rgba(56,189,248,0.25);
+  border-color: rgba(77,214,147,0.25);
   transform: translateY(-4px);
 }
 .q-icon {
   width: 52px; height: 52px; border-radius: 14px;
-  background: rgba(2,132,199,0.15);
+  background: rgba(26,143,90,0.15);
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 22px; color: var(--accent-light);
 }
@@ -579,7 +578,7 @@ section { position: relative; padding: var(--section-pad) }
 }
 
 /* ---------- Why Choose ---------- */
-.why { background: var(--bg-light-gray) }
+.why { background: var(--bg-off-white) }
 .why-inner { display: grid; grid-template-columns: .85fr 1.15fr; gap: 80px; align-items: start }
 .why-list { display: flex; flex-direction: column; gap: 2px }
 .why-item {
@@ -623,7 +622,7 @@ section { position: relative; padding: var(--section-pad) }
 .industry-chip:hover svg { color: var(--accent-light) }
 
 /* ---------- Process ---------- */
-.process { background: var(--bg-light-gray) }
+.process { background: var(--bg-off-white) }
 .process-timeline { position: relative; margin-top: 20px }
 .process-timeline::before {
   content: ""; position: absolute; top: 56px; left: 5%; right: 5%;
@@ -673,7 +672,7 @@ section { position: relative; padding: var(--section-pad) }
 .founder-block::before {
   content: "\201C"; position: absolute; top: -30px; right: 50px;
   font-family: var(--font-heading); font-size: 200px;
-  color: rgba(2,132,199,0.1); line-height: 1;
+  color: rgba(26,143,90,0.1); line-height: 1;
 }
 .founder-eyebrow {
   color: var(--accent-light); font-size: 11px; letter-spacing: 0.22em;
@@ -715,7 +714,7 @@ section { position: relative; padding: var(--section-pad) }
 @media (max-width: 900px) { .founder-block { padding: 40px 24px } .test-grid { grid-template-columns: 1fr } }
 
 /* ---------- FAQ ---------- */
-.faq { background: var(--bg-light-gray) }
+.faq { background: var(--bg-off-white) }
 .faq-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; align-items: start }
 .faq-list { display: flex; flex-direction: column }
 .faq-item { border-top: 1px solid var(--line) }
@@ -756,8 +755,8 @@ section { position: relative; padding: var(--section-pad) }
 }
 .cta::before {
   content: ""; position: absolute; inset: 0;
-  background: radial-gradient(circle at 20% 30%, rgba(2,132,199,0.2), transparent 50%),
-              radial-gradient(circle at 80% 70%, rgba(2,132,199,0.1), transparent 50%);
+  background: radial-gradient(circle at 20% 30%, rgba(26,143,90,0.2), transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(26,143,90,0.1), transparent 50%);
   pointer-events: none;
 }
 .cta-inner { position: relative; text-align: center; max-width: 860px; margin: 0 auto }
@@ -842,7 +841,7 @@ section { position: relative; padding: var(--section-pad) }
 .progress-bar {
   position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 9996;
   background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
-  box-shadow: 0 0 8px rgba(2,132,199,0.5); transition: width .1s linear;
+  box-shadow: 0 0 8px rgba(26,143,90,0.5); transition: width .1s linear;
 }
 
 /* ---------- Split Text ---------- */
@@ -892,8 +891,8 @@ section { position: relative; padding: var(--section-pad) }
   position: absolute; border-radius: 50%; filter: blur(70px);
   pointer-events: none; opacity: .3; z-index: 0;
 }
-.orb-a { width: 400px; height: 400px; background: rgba(2,132,199,0.4); animation: drift-a 22s ease-in-out infinite }
-.orb-b { width: 320px; height: 320px; background: rgba(56,189,248,0.25); animation: drift-b 28s ease-in-out infinite }
+.orb-a { width: 400px; height: 400px; background: rgba(26,143,90,0.4); animation: drift-a 22s ease-in-out infinite }
+.orb-b { width: 320px; height: 320px; background: rgba(77,214,147,0.25); animation: drift-b 28s ease-in-out infinite }
 @keyframes drift-a { 0%,100% { transform: translate(-10%,-15%) } 33% { transform: translate(30%,20%) } 66% { transform: translate(60%,-10%) } }
 @keyframes drift-b { 0%,100% { transform: translate(70%,60%) } 50% { transform: translate(10%,10%) } }
 .quality .container, .cta .container { position: relative; z-index: 1 }
@@ -965,7 +964,7 @@ section { position: relative; padding: var(--section-pad) }
 }
 .sku-card .sku-badge {
   display: inline-block; margin-top: 10px; padding: 4px 10px;
-  background: rgba(2,132,199,0.08); color: var(--accent);
+  background: rgba(26,143,90,0.08); color: var(--accent);
   border-radius: 100px; font-size: 11px; font-weight: 600;
 }
 
