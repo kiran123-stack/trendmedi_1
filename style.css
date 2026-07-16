@@ -566,6 +566,16 @@ section { position: relative; padding: var(--section-pad) }
   clip-path: ellipse(70% 100% at 100% 50%);
   width: 480px; height: 280px;
 }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .industries .process-head-img img {
+    clip-path: none;
+    -webkit-clip-path: none; /* Safari */
+    width: 100%;
+    height: auto;
+  }
+}
 .process .process-head-img img {
   /* Beveled corner — rectangle with one cut corner */
   clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
